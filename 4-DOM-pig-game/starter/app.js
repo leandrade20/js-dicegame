@@ -9,7 +9,14 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, winner;
+var scores, roundScore, activePlayer, winner,gameRunning;
+
+var inputScore, finalInputScore;
+
+/* creating new rule if player get 6 twice in a row, they lose the entire score */
+var lastDice;
+
+// var inputScore;
 
 init();
 // dice = Math.floor(Math.random() * 6) + 1;
@@ -21,7 +28,7 @@ init();
 
 document.querySelector(".btn-roll").addEventListener("click", function () {
   //1. Random number
-
+if(gameRunning){
   var dice = Math.floor(Math.random() * 6) + 1;
   console.log(dice);
 
@@ -30,8 +37,12 @@ document.querySelector(".btn-roll").addEventListener("click", function () {
   diceDom.style.display = "block";
   diceDom.src = "dice-" + dice + ".png";
 
+  if(dice === 6 && lastDice === 6){
+    document.querySelector("#score-" + activePlayer).textContent = 0;
+    nextPlayer();
+  }
   //3. Update round score IF the rolled number is NOT 1
-  if (dice !== 1) {
+  else if (dice !== 1) {
     roundScore += dice;
     document.querySelector("#current-" + activePlayer).textContent = roundScore;
   } else {
@@ -39,24 +50,33 @@ document.querySelector(".btn-roll").addEventListener("click", function () {
     // document.querySelector("#score-" + activePlayer) = score;
     nextPlayer();
   }
+
+  lastDice = dice;
+}
 });
 
 document.querySelector(".btn-hold").addEventListener("click", function () {
   //get the round score
+  if(gameRunning){
   scores[activePlayer] += roundScore;
   document.querySelector("#score-" + activePlayer).textContent =
     scores[activePlayer];
   // add roundscore to
   // gameWinner();
-  if (scores[activePlayer] > 9) {
+
+  
+
+  if (scores[activePlayer] > (finalInputScore - 1)) {
     document.querySelector("#name-" + activePlayer).textContent = "WINNER";
     document.querySelector("#name-" + activePlayer).classList.add("winner");
     document.querySelector(".player-0-panel").classList.remove("active");
     document.querySelector(".player-1-panel").classList.remove("active");
     document.querySelector(".dice").style.display = "none";
+    gameRunning = false;
   } else {
     nextPlayer();
   }
+}
 });
 
 function nextPlayer() {
@@ -84,7 +104,11 @@ function init() {
   roundScore = 0;
   activePlayer = 0;
   winner = 0;
+  gameRunning = true;
 
+
+  
+  document.querySelector(".finalscore-popup").style.display = "block";
   document.querySelector(".dice").style.display = "none";
   // way to insert css change
   document.getElementById("score-0").textContent = 0;
@@ -99,6 +123,23 @@ function init() {
   document.querySelector(".player-0-panel").classList.add("active");
   document.querySelector(".player-1-panel").classList.remove("active");
 }
+
+document.querySelector(".start").addEventListener("click", function () {
+
+  inputScore =  document.querySelector(".final-score").value;
+  console.log(inputScore);
+  document.querySelector(".finalscore-popup").style.display = "none";
+
+  //Undefined, 0 , NULL or "" are coerce to false
+  if(inputScore){
+     finalInputScore = inputScore;
+  }
+  else{
+    finalInputScore = 10;
+  }
+});
+
+
 // function gameWinner() {
 //   winner = document.querySelector("#score-" + activePlayer).textContent;
 //   if (winner > 9) {
